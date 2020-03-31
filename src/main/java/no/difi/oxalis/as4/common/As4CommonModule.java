@@ -33,11 +33,17 @@ import no.difi.oxalis.as4.config.As4Conf;
 import no.difi.oxalis.as4.outbound.ActionProvider;
 import no.difi.oxalis.as4.outbound.DefaultActionProvider;
 import no.difi.oxalis.as4.util.As4MessageFactory;
+import no.difi.oxalis.as4.util.OxalisAlgorithmSuiteLoader;
 import no.difi.oxalis.as4.util.PolicyService;
 import no.difi.oxalis.as4.util.TransmissionRequestUtil;
 import no.difi.oxalis.commons.guice.ImplLoader;
 import no.difi.oxalis.commons.guice.OxalisModule;
 import no.difi.vefa.peppol.mode.Mode;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.wss4j.dom.engine.WSSConfig;
+
+import java.security.Security;
 
 import static no.difi.oxalis.as4.common.AS4Constants.*;
 
@@ -51,6 +57,13 @@ public class As4CommonModule extends OxalisModule {
         bind(As4MessageFactory.class);
         bindSettings(As4Conf.class);
         bind(MerlinProvider.class);
+
+        Bus bus = BusFactory.newInstance().createBus();
+        new OxalisAlgorithmSuiteLoader(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        Security.setProperty("jdk.security.provider.preferred", "AES/GCM/NoPadding:BC");
+        WSSConfig.init();
     }
 
     @Provides
