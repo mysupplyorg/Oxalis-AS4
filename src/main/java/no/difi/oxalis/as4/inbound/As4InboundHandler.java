@@ -20,6 +20,7 @@ import no.difi.oxalis.as4.common.As4MessageProperties;
 import no.difi.oxalis.as4.common.As4MessageProperty;
 import no.difi.oxalis.as4.util.*;
 import no.difi.oxalis.commons.header.SbdhHeaderParser;
+import no.difi.oxalis.commons.io.PeekingInputStream;
 import no.difi.oxalis.commons.io.UnclosableInputStream;
 import no.difi.vefa.peppol.common.code.DigestMethod;
 import no.difi.vefa.peppol.common.model.*;
@@ -29,11 +30,13 @@ import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.neethi.Policy;
 import org.oasis_open.docs.ebxml_msg.ebms.v3_0.ns.core._200704.*;
 import org.w3.xmldsig.ReferenceType;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.soap.*;
 import javax.xml.ws.handler.MessageContext;
 import java.io.BufferedInputStream;
@@ -106,9 +109,14 @@ public class As4InboundHandler {
             // Handle payload
             LinkedHashMap<InputStream, As4PayloadHeader> payloads = parseAttachments(attachments, userMessage);
 
+            HttpServletRequest httpReq = (HttpServletRequest)messageContext.get(AbstractHTTPDestination.HTTP_REQUEST);
+            String serverName = httpReq.getServerName();
+
             List<Path> paths = new ArrayList<>();
             for (Map.Entry<InputStream, As4PayloadHeader> payload : payloads.entrySet()) {
                 validateAttachmentHeader(payload.getValue());
+
+                payload.getValue().setServer(serverName);
 
                 // Persist payload
                 paths.add(persistPayload(payload.getKey(), payload.getValue(), messageId));
@@ -135,6 +143,8 @@ public class As4InboundHandler {
                     senderCertificate,
                     copyOfReceipt,
                     envelopeHeader);
+
+            as4InboundMetadata.setServer(serverName);
 
             try {
                 persisterHandler.persist(as4InboundMetadata, firstPayloadPath);

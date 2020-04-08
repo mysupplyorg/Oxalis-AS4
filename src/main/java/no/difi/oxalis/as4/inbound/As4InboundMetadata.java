@@ -101,4 +101,13 @@ public class As4InboundMetadata implements InboundMetadata {
     public As4EnvelopeHeader getAs4EnvelopeHeader() {
         return as4EnvelopeHeader;
     }
+
+    public String server;
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
+    }
 }

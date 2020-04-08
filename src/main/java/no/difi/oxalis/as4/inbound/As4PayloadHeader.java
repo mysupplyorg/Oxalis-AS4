@@ -125,4 +125,12 @@ public class As4PayloadHeader extends Header {
     public Date getCreationTimestamp() {
         return header.getCreationTimestamp();
     }
+
+    public String server;
+    public String getServer() {
+        return server;
+    }
+    public void setServer(String server) {
+        this.server = server;
+    }
 }
