@@ -212,7 +212,7 @@ public class SendReceiveTest extends AbstractJettyServerTest {
         private Map<String, Data> map = new TreeMap<>();
 
         @Override
-        public Path persist(TransmissionIdentifier transmissionIdentifier, Header header, InputStream is) throws IOException {
+        public Path persist(TransmissionIdentifier transmissionIdentifier, Header header, InputStream is, String serverName) throws IOException {
 
             Path path = Files.createTempFile(transmissionIdentifier.getIdentifier(), "tmp");
 
