@@ -118,7 +118,7 @@ public class As4InboundHandler {
                 payload.getValue().setServer(serverName);
 
                 // Persist payload
-                paths.add(persistPayload(payload.getKey(), payload.getValue(), messageId));
+                paths.add(persistPayload(payload.getKey(), payload.getValue(), messageId, serverName));
             }
 
             Path firstPayloadPath = paths.get(0);
@@ -471,10 +471,10 @@ public class As4InboundHandler {
         }
     }
 
-    private Path persistPayload(InputStream inputStream, As4PayloadHeader as4PayloadHeader, TransmissionIdentifier ti) throws OxalisAs4Exception {
+    private Path persistPayload(InputStream inputStream, As4PayloadHeader as4PayloadHeader, TransmissionIdentifier ti, String serverName) throws OxalisAs4Exception {
         try (InputStream is = inputStream) {
             // Persist content
-            Path payloadPath = persisterHandler.persist(ti, as4PayloadHeader, new UnclosableInputStream(is));
+            Path payloadPath = persisterHandler.persist(ti, as4PayloadHeader, new UnclosableInputStream(is), serverName);
 
             // Exhaust InputStream
             ByteStreams.exhaust(is);
